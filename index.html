@@ -1,0 +1,577 @@
+<title>UTM 連結產生器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
+<style>
+:root{
+  --ground:#ECEBE6;
+  --surface:#F6F5F1;
+  --surface-hi:#FFFFFF;
+  --sunk:#E4E3DD;
+  --ink:#33342F;
+  --ink-2:#696A62;
+  --ink-3:#9A9A91;
+  --line:#DCDBD4;
+  --mint:#A9DFC7;
+  --mint-2:#C9EBDB;
+  --on-mint:#1F4A39;
+  --mint-ink:#3B8767;
+  --glow:rgba(103,205,166,.55);
+  --butter:#F3E3A4;
+  --on-butter:#6E560F;
+  --rose:#F0B9B5;
+  --on-rose:#8A3430;
+  --raise:inset 0 1px 0 rgba(255,255,255,.95), 0 1px 2px rgba(70,68,58,.06), 0 14px 30px -16px rgba(70,68,58,.30);
+  --raise-sm:inset 0 1px 0 rgba(255,255,255,.9), 0 1px 1px rgba(70,68,58,.06), 0 6px 14px -8px rgba(70,68,58,.32);
+  --press:inset 0 2px 5px rgba(70,68,58,.13), inset 0 -1px 0 rgba(255,255,255,.75);
+  --sans:"Plus Jakarta Sans","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+  --cjk:"Noto Sans TC","Plus Jakarta Sans","Microsoft JhengHei",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#1B1D1C;
+  --surface:#252827;
+  --surface-hi:#2E3230;
+  --sunk:#181A19;
+  --ink:#E9E8E2;
+  --ink-2:#A6A79F;
+  --ink-3:#757770;
+  --line:#343836;
+  --mint:#7FCBAA;
+  --mint-2:#2C4A3D;
+  --on-mint:#0F271D;
+  --mint-ink:#9FE0C3;
+  --glow:rgba(127,203,170,.45);
+  --butter:#D8BF6E;
+  --on-butter:#2A2106;
+  --rose:#D98E8A;
+  --on-rose:#2E0F0D;
+  --raise:inset 0 1px 0 rgba(255,255,255,.05), 0 1px 2px rgba(0,0,0,.35), 0 16px 32px -18px rgba(0,0,0,.8);
+  --raise-sm:inset 0 1px 0 rgba(255,255,255,.06), 0 6px 14px -8px rgba(0,0,0,.75);
+  --press:inset 0 2px 6px rgba(0,0,0,.55), inset 0 -1px 0 rgba(255,255,255,.04);
+}}
+:root[data-theme="dark"]{
+  --ground:#1B1D1C;
+  --surface:#252827;
+  --surface-hi:#2E3230;
+  --sunk:#181A19;
+  --ink:#E9E8E2;
+  --ink-2:#A6A79F;
+  --ink-3:#757770;
+  --line:#343836;
+  --mint:#7FCBAA;
+  --mint-2:#2C4A3D;
+  --on-mint:#0F271D;
+  --mint-ink:#9FE0C3;
+  --glow:rgba(127,203,170,.45);
+  --butter:#D8BF6E;
+  --on-butter:#2A2106;
+  --rose:#D98E8A;
+  --on-rose:#2E0F0D;
+  --raise:inset 0 1px 0 rgba(255,255,255,.05), 0 1px 2px rgba(0,0,0,.35), 0 16px 32px -18px rgba(0,0,0,.8);
+  --raise-sm:inset 0 1px 0 rgba(255,255,255,.06), 0 6px 14px -8px rgba(0,0,0,.75);
+  --press:inset 0 2px 6px rgba(0,0,0,.55), inset 0 -1px 0 rgba(255,255,255,.04);
+}
+
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--cjk);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px;padding-block:40px 72px}
+
+/* ---------- header ---------- */
+header{margin-bottom:30px}
+.eyebrow{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mint-ink);margin:0 0 8px}
+h1{font-family:var(--sans);font-weight:800;font-size:clamp(30px,6vw,46px);line-height:1.08;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.sub{color:var(--ink-2);margin:12px 0 0;max-width:56ch;font-size:15px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:18px}
+.tag{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);background:var(--surface);box-shadow:var(--raise-sm);border-radius:999px;padding:5px 11px}
+.tag b{color:var(--ink);font-weight:500}
+
+.cols{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:26px;align-items:start}
+
+/* ---------- step cards ---------- */
+.step{background:var(--surface);border:none;border-radius:22px;box-shadow:var(--raise);padding:20px 20px 22px;margin:0 0 18px;min-width:0}
+.step-h{display:flex;align-items:center;gap:11px;margin:0 0 4px;padding:0;float:left;width:100%}
+.step-h + *{clear:both}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.num{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-family:var(--sans);font-weight:800;font-size:13px;background:var(--mint);color:var(--on-mint);box-shadow:var(--raise-sm)}
+.step-t{font-family:var(--sans);font-weight:700;font-size:17px;letter-spacing:-.005em}
+.step-t small{font-family:var(--cjk);font-weight:500;font-size:13px;color:var(--ink-3);margin-left:6px}
+.lead{font-size:13.5px;color:var(--ink-2);margin:6px 0 14px 39px;max-width:52ch}
+
+.grp{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:14px 0 8px}
+.grp:first-of-type{margin-top:4px}
+
+/* radio chips */
+.chipset{display:flex;flex-wrap:wrap;gap:9px}
+.rchip{position:relative;display:inline-flex}
+.rchip input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer}
+.rchip span{
+  display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:999px;
+  background:var(--surface-hi);color:var(--ink);box-shadow:var(--raise-sm);
+  font-size:14px;font-weight:500;line-height:1.2;transition:box-shadow .18s, background .18s, transform .12s
+}
+.rchip span code{font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+.rchip:hover span{transform:translateY(-1px)}
+.rchip input:checked + span{background:var(--mint);color:var(--on-mint);box-shadow:inset 0 1px 0 rgba(255,255,255,.45), 0 0 0 3px var(--glow), 0 8px 16px -10px rgba(40,90,70,.5)}
+.rchip input:checked + span code{color:var(--on-mint);opacity:.7}
+.rchip input:checked + span::before{content:"";width:12px;height:12px;flex:none;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.3l2.6 2.5L10 3.4' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.3l2.6 2.5L10 3.4' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+.rchip input:focus-visible + span{box-shadow:0 0 0 3px var(--glow), var(--raise-sm)}
+.rchip.muted span{background:var(--sunk);color:var(--ink-3);box-shadow:var(--press)}
+.rchip.muted input:checked + span{background:var(--rose);color:var(--on-rose);box-shadow:0 0 0 3px rgba(217,142,138,.35)}
+
+.hint{font-size:13px;color:var(--ink-2);margin:12px 0 0;line-height:1.55}
+.hint code{font-family:var(--mono);font-size:12px;color:var(--mint-ink)}
+
+/* fields */
+.field{margin-top:14px}
+.field label{display:block;font-size:13px;font-weight:700;margin:0 0 7px}
+input[type=text],select{
+  width:100%;font-family:var(--mono);font-size:14px;color:var(--ink);
+  background:var(--sunk);border:none;border-radius:16px;box-shadow:var(--press);
+  padding:12px 16px;line-height:1.4;transition:box-shadow .18s
+}
+select{font-family:var(--cjk);font-size:14.5px;appearance:none;-webkit-appearance:none;padding-right:42px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.6l3 3 3-3' fill='none' stroke='%23999' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 16px center;background-size:13px}
+select option, select optgroup{background:var(--surface);color:var(--ink)}
+input[type=text]::placeholder{color:var(--ink-3)}
+input[type=text]:focus-visible,select:focus-visible{outline:none;box-shadow:var(--press), 0 0 0 3px var(--glow)}
+.picked{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin:8px 2px 0;word-break:break-all;line-height:1.5}
+
+/* example card for step 3 */
+.example{background:var(--surface-hi);border-radius:16px;box-shadow:var(--raise-sm);padding:14px 16px;margin:0 0 4px}
+.example p{margin:0 0 9px;font-size:13.5px;color:var(--ink-2)}
+.ex-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:7px 0;border-top:1px dashed var(--line);font-size:14px}
+.ex-row code{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--mint-ink);background:var(--mint-2);padding:3px 9px;border-radius:999px}
+.example .foot{margin:10px 0 0;font-size:13px;color:var(--ink-3)}
+
+/* content chips */
+.cchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.cchip{
+  font-family:var(--cjk);font-size:13px;font-weight:500;color:var(--ink);
+  background:var(--surface-hi);box-shadow:var(--raise-sm);border:none;border-radius:999px;
+  padding:7px 13px;cursor:pointer;display:inline-flex;gap:6px;align-items:center;transition:transform .12s, box-shadow .18s
+}
+.cchip code{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.cchip:hover{transform:translateY(-1px)}
+.cchip.on{background:var(--mint);color:var(--on-mint);box-shadow:0 0 0 3px var(--glow)}
+.cchip.on code{color:var(--on-mint);opacity:.7}
+.cchip.clear{background:transparent;box-shadow:none;color:var(--ink-3);text-decoration:underline;text-underline-offset:3px;padding-inline:6px}
+.cchip:focus-visible{outline:none;box-shadow:0 0 0 3px var(--glow)}
+
+/* ---------- result ---------- */
+.result{position:sticky;top:18px}
+.out{background:var(--surface);border-radius:24px;box-shadow:var(--raise);overflow:hidden}
+.out-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px 0}
+.out-top span{font-family:var(--sans);font-weight:700;font-size:15px}
+.out-top small{display:block;font-family:var(--cjk);font-weight:400;font-size:12.5px;color:var(--ink-3);margin-top:2px}
+.out-box{margin:14px 14px 0;background:var(--sunk);box-shadow:var(--press);border-radius:16px;padding:16px}
+#output{margin:0;font-family:var(--mono);font-size:13px;line-height:1.85;word-break:break-all;white-space:pre-wrap;color:var(--ink-2);min-height:70px}
+#output .q{color:var(--mint-ink);font-weight:600}
+#output.blocked{color:var(--on-rose)}
+.out-actions{padding:14px}
+button.copy{
+  width:100%;font-family:var(--sans);font-size:15px;font-weight:700;color:var(--on-mint);
+  background:var(--mint);border:none;border-radius:999px;padding:13px 18px;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5), 0 10px 22px -12px rgba(40,110,80,.6);
+  transition:box-shadow .2s, transform .12s
+}
+button.copy:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.5), 0 0 0 4px var(--glow), 0 12px 24px -12px rgba(40,110,80,.6);transform:translateY(-1px)}
+button.copy:focus-visible{outline:none;box-shadow:0 0 0 4px var(--glow)}
+button.copy[disabled]{background:var(--sunk);color:var(--ink-3);box-shadow:var(--press);cursor:not-allowed;transform:none}
+
+.alerts{display:grid;gap:10px;margin-top:16px}
+.alert{display:grid;grid-template-columns:20px 1fr;gap:10px;align-items:start;border-radius:16px;padding:12px 15px;font-size:13.5px;line-height:1.55;box-shadow:var(--raise-sm)}
+.alert svg{width:20px;height:20px;margin-top:1px}
+.alert.ok{background:var(--mint);color:var(--on-mint)}
+.alert.warn{background:var(--butter);color:var(--on-butter)}
+.alert.err{background:var(--rose);color:var(--on-rose)}
+.alert.info{background:var(--surface-hi);color:var(--ink-2)}
+.alert.info svg{color:var(--mint-ink)}
+.alert b{font-weight:700}
+.alert code{font-family:var(--mono);font-size:12px}
+
+.parts{margin:16px 0 0;background:var(--surface);border-radius:20px;box-shadow:var(--raise);padding:8px 18px}
+.parts div{display:grid;grid-template-columns:124px 1fr;gap:12px;padding:9px 0;border-top:1px solid var(--line)}
+.parts div:first-child{border-top:none}
+.parts dt{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin:0}
+.parts dd{margin:0;font-family:var(--mono);font-size:12.5px;font-weight:500;word-break:break-all}
+.parts dd.empty{color:var(--ink-3);font-weight:400;font-family:var(--cjk)}
+
+footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line)}
+footer p{font-size:12.5px;color:var(--ink-3);margin:0 0 5px;max-width:72ch}
+
+@media (max-width:860px){
+  .cols{grid-template-columns:1fr;gap:4px}
+  .result{position:static}
+}
+@media (max-width:460px){
+  .lead{margin-left:0}
+  .parts div{grid-template-columns:1fr;gap:2px}
+  .step{padding:18px 16px 20px;border-radius:20px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.rchip:hover span,.cchip:hover,button.copy:hover{transform:none}}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">VitaVerse 維他宇宙 · 行銷工具</p>
+    <h1>UTM 連結產生器</h1>
+    <p class="sub">點選這條連結要用在哪裡、哪一檔活動、導去哪一頁，右邊就會產生符合公司規範的追蹤連結。</p>
+    <div class="meta">
+      <span class="tag"><b>依據</b> UTM 命名規範 v1.5</span>
+      <span class="tag"><b>官網頁面</b> 31 頁 · 2026-10-15 更新</span>
+    </div>
+  </header>
+
+  <div class="cols">
+
+    <div>
+      <fieldset class="step">
+        <legend class="step-h"><span class="num">1</span><span class="step-t">用在哪裡</span></legend>
+        <p class="lead">選這條連結要貼去的地方。來源和媒介會自動帶入，不用自己填。</p>
+        <div id="channelSets"></div>
+        <p class="hint" id="channelHint"></p>
+        <div class="field" id="kolBox" hidden>
+          <label for="kolName">KOL 英文代號</label>
+          <input type="text" id="kolName" placeholder="例如 shinyi" autocomplete="off">
+        </div>
+      </fieldset>
+
+      <fieldset class="step">
+        <legend class="step-h"><span class="num">2</span><span class="step-t">哪一檔活動</span></legend>
+        <p class="lead">GA4 用這個代碼把同一波活動的流量加在一起。</p>
+        <div class="chipset" id="campSet"></div>
+        <div class="field" id="campCustomBox" hidden>
+          <label for="campCustom">新檔期代碼</label>
+          <input type="text" id="campCustom" placeholder="例如 double11_2611" autocomplete="off">
+          <p class="hint">格式是 <code>主題_年月</code>，年月四碼。新檔期請先登錄到規範文件再使用。</p>
+        </div>
+      </fieldset>
+
+      <fieldset class="step">
+        <legend class="step-h"><span class="num">3</span><span class="step-t">這是哪一篇<small>可以不填</small></span></legend>
+        <p class="lead">同一檔活動發了好幾篇貼文時，給每篇一個英文小名，GA4 才分得出是哪一篇帶來的人。</p>
+        <div class="example">
+          <p>例如開幕檔期發了兩篇貼文：</p>
+          <div class="ex-row"><span>宣布官網開幕的那篇</span><code>opening</code></div>
+          <div class="ex-row"><span>第二件五折優惠的那篇</span><code>2nd50off</code></div>
+          <p class="foot">這檔只發一篇，或只想看整檔總成效，這格就空著。</p>
+        </div>
+        <div class="field">
+          <label for="content">這篇的英文小名</label>
+          <input type="text" id="content" placeholder="點下面常用的，或自己打" autocomplete="off">
+          <div class="cchips" id="contentChips"></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="step" id="pageFs">
+        <legend class="step-h"><span class="num">4</span><span class="step-t">導去哪一頁</span></legend>
+        <p class="lead" id="pageLead">點連結的人會落在官網的哪一頁。</p>
+        <div class="field" style="margin-top:0">
+          <label for="page" class="sr">官網頁面</label>
+          <select id="page"></select>
+          <p class="picked" id="pagePicked"></p>
+        </div>
+        <div class="field" id="pageCustomBox" hidden>
+          <label for="pageCustom">自訂網址</label>
+          <input type="text" id="pageCustom" placeholder="https://vitaverse.com.tw/..." autocomplete="off">
+          <p class="hint">請從瀏覽器網址列複製，不要用 Shopify 後台的「複製連結」按鈕。</p>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="result">
+      <div class="out">
+        <div class="out-top">
+          <div><span id="outLabel">完整連結</span><small id="outSub">複製後直接貼到貼文或文件裡</small></div>
+        </div>
+        <div class="out-box"><p id="output"></p></div>
+        <div class="out-actions"><button class="copy" id="copyBtn" type="button">複製連結</button></div>
+      </div>
+
+      <div class="alerts" id="alerts" role="status" aria-live="polite"></div>
+
+      <dl class="parts" id="parts"></dl>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>所有固定值依據公司 UTM 命名規範：全小寫、底線分隔、不使用中文與空格。自己輸入的內容會自動轉成小寫，空白換成底線。</p>
+    <p>官網頁面清單來自 vitaverse.com.tw 網站地圖。官網新增商品或頁面後，工具需要手動更新清單。</p>
+  </footer>
+
+</div>
+
+<script>
+var ICON = {
+  ok:'<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6.4 10.3l2.4 2.3 4.8-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  warn:'<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.8l8 14H2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 8v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="14.4" r="1" fill="currentColor"/></svg>',
+  err:'<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 5.8v5.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="10" cy="14" r="1.1" fill="currentColor"/></svg>',
+  info:'<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 9v5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="10" cy="6.2" r="1.1" fill="currentColor"/></svg>'
+};
+
+var CHANNELS = [
+  {id:'meta_ads', group:'付費投放', label:'Meta 廣告', source:'facebook', medium:'paid_social', mode:'params',
+   hint:'有花錢投放的 FB／IG 廣告。產出的是一段參數，貼在廣告後台。',
+   info:'貼到 Meta 廣告「追蹤 → 網址參數」欄位，<b>開頭不要加問號</b>。上面的「網站網址」欄位另外貼乾淨的官網網址。同一檔活動的所有廣告貼同一段。'},
+  {id:'fb_organic', group:'自然發文', label:'FB 粉專', source:'facebook', medium:'social', mode:'url',
+   hint:'沒有花錢的粉專貼文。',
+   info:'FB 貼文可以直接貼完整連結。等連結預覽卡出現後，把內文那串網址刪掉，預覽卡還會留著，版面比較乾淨。'},
+  {id:'ig_organic', group:'自然發文', label:'Instagram', source:'instagram', medium:'social', mode:'url',
+   hint:'沒有花錢的 IG 貼文、限時動態、個人檔案連結。',
+   info:'IG <b>貼文內文的連結點不了</b>，請放在個人檔案連結或限動的連結貼紙。'},
+  {id:'line', group:'自然發文', label:'LINE 官方帳號', source:'line', medium:'social', mode:'url',
+   hint:'LINE 推播訊息、圖文選單。'},
+  {id:'edm', group:'其他管道', label:'EDM 電子報', source:'omnisend', medium:'email', mode:'url',
+   hint:'Omnisend 寄出的電子報與自動信。',
+   info:'每封信用第 3 步給不同的小名，才分得出是哪一封帶來的。'},
+  {id:'pr', group:'其他管道', label:'新聞稿', source:'pressrelease', medium:'referral', mode:'url',
+   hint:'發給媒體的新聞稿，各家媒體共用同一條。',
+   info:'新聞稿<b>請用完整連結，不要縮網址</b>。發稿時在備註寫「連結請完整保留，含參數」，編輯最常把問號後面整段刪掉。'},
+  {id:'kol', group:'其他管道', label:'KOL 合作', source:'kol_', medium:'referral', mode:'url', needsName:true,
+   hint:'合作網紅的貼文或影片，每位網紅一個代號。'},
+  {id:'google_ads', group:'不需要掛', label:'Google Ads', muted:true,
+   blocked:'Google Ads <b>不用掛 UTM</b>。Google 會自動辨識，手動加上去反而會蓋掉原本的資料。'},
+  {id:'internal', group:'不需要掛', label:'官網站內連結', muted:true,
+   blocked:'官網自己頁面之間的連結<b>絕對不能掛 UTM</b>。會把同一個訪客拆成兩個人，整個官網的數據都會亂掉。'}
+];
+
+var CAMPAIGNS = [
+  {code:'newopen_2610', label:'官網開幕慶'},
+  {code:'newopen_2610_pr', label:'開幕新聞稿'},
+  {code:'profile_bio', label:'IG 個人檔案連結'},
+  {code:'__custom__', label:'新檔期…'}
+];
+
+var CONTENT_PRESETS = [
+  {v:'opening', t:'開幕宣告'},
+  {v:'2nd50off', t:'第二件五折'},
+  {v:'post', t:'一般貼文'},
+  {v:'story', t:'限時動態'},
+  {v:'reels', t:'Reels'},
+  {v:'bio', t:'個人檔案連結'}
+];
+
+var B = 'https://vitaverse.com.tw';
+var PAGES = [
+  {g:'', items:[
+    {p:'/', t:'官網首頁'}
+  ]},
+  {g:'商品', items:[
+    {p:'/products/vitaverse%E7%B6%AD%E4%BB%96%E5%AE%87%E5%AE%99%E5%B0%8F%E7%BD%90%E8%8F%8Cvitaxall%E7%BD%90%E8%A3%9D%E7%9B%8A%E7%94%9F%E8%8F%8C%E5%B0%8F%E8%97%8D%E7%93%B6', t:'VitaxAll™ 小罐菌益生菌（小藍瓶）'},
+    {p:'/products/vitaxshape%E2%84%A2%E5%B0%8F%E7%BD%90%E8%8F%8C%E5%8D%B3%E9%A3%9F%E7%9B%8A%E7%94%9F%E8%8F%8C%E5%B0%8F%E7%B2%89%E7%93%B6', t:'VitaxShape™ 小罐菌益生菌（小粉瓶）'}
+  ]},
+  {g:'商品分類', items:[
+    {p:'/collections/%E7%B6%AD%E4%BB%96%E5%AE%87%E5%AE%99%E5%B0%8F%E7%BD%90%E8%8F%8C%E7%B3%BB%E5%88%97', t:'獨家小罐菌™ 益生菌系列'},
+    {p:'/collections/%E5%A5%B3%E6%80%A7', t:'女性'},
+    {p:'/collections/%E7%94%B7%E6%80%A7', t:'男性'}
+  ]},
+  {g:'優惠與會員', items:[
+    {p:'/pages/%E5%84%AA%E6%83%A0%E8%AA%AA%E6%98%8E%E9%A0%81%E9%9D%A2', t:'優惠說明'},
+    {p:'/pages/%E6%9C%83%E5%93%A1%E6%9C%80%E6%96%B0%E6%B4%BB%E5%8B%95', t:'會員最新活動'},
+    {p:'/pages/%E9%BB%9E%E6%95%B8%E5%84%AA%E6%83%A0', t:'點數優惠'}
+  ]},
+  {g:'品牌介紹', items:[
+    {p:'/pages/%E5%93%81%E7%89%8C%E7%90%86%E5%BF%B5', t:'品牌理念'},
+    {p:'/pages/%E5%89%B5%E8%BE%A6%E4%BA%BA%E7%9A%84%E8%A9%B1', t:'創辦人的話'},
+    {p:'/pages/%E5%B0%88%E6%A5%AD%E5%9C%98%E9%9A%8A', t:'專業團隊'},
+    {p:'/pages/%E5%AE%89%E5%BF%83%E6%8A%8A%E9%97%9C', t:'安心把關'},
+    {p:'/pages/%E7%A4%BE%E6%9C%83%E8%B2%AC%E4%BB%BB', t:'社會責任'}
+  ]},
+  {g:'專欄與消息', items:[
+    {p:'/pages/%E6%9C%80%E6%96%B0%E6%B6%88%E6%81%AF%E5%88%86%E6%B5%81%E9%A0%81%E9%9D%A2', t:'最新消息（總覽頁）'},
+    {p:'/blogs/news', t:'最新消息'},
+    {p:'/pages/%E5%81%A5%E5%BA%B7%E8%88%87%E7%BE%8E%E5%B0%88%E6%AC%84%E5%88%86%E6%B5%81%E9%A0%81%E9%9D%A2', t:'健康與美專欄（總覽頁）'},
+    {p:'/blogs/health-beauty', t:'健康與美專欄'},
+    {p:'/blogs/%E7%A7%91%E5%AD%B8%E7%87%9F%E9%A4%8A%E5%B8%AB%E5%B0%88%E6%AC%84', t:'科學營養師專欄'},
+    {p:'/blogs/%E7%BE%8E%E8%82%8C%E7%AE%A1%E7%90%86%E5%B8%AB%E5%B0%88%E6%AC%84', t:'美肌管理師專欄'}
+  ]},
+  {g:'專欄文章', items:[
+    {p:'/blogs/health-beauty/%E6%96%B0%E4%B8%96%E4%BB%A3%E7%9A%84%E5%81%A5%E5%BA%B7%E9%98%B2%E7%A6%A6%E8%88%87%E4%BB%A3%E8%AC%9D%E7%AE%A1%E7%90%86-%E5%B0%88%E7%82%BA%E6%82%A8%E8%A8%AD%E8%A8%88%E7%9A%84vitaverse%E5%B0%8F%E7%BD%90%E8%8F%8C%E7%9B%8A%E7%94%9F%E8%8F%8C', t:'新世代的健康防禦與代謝管理'},
+    {p:'/blogs/health-beauty/probiotic-types-strains', t:'益生菌種類怎麼挑？菌種、菌株、菌數、CFU'},
+    {p:'/blogs/health-beauty/%E7%9B%8A%E7%94%9F%E8%8F%8C%E7%A8%AE%E9%A1%9E%E6%9C%89%E5%93%AA%E4%BA%9B-%E5%85%88%E8%AA%8D%E8%AD%98-4-%E9%A1%9E%E5%B8%B8%E8%A6%8B%E7%9B%8A%E7%94%9F%E8%8F%8C', t:'益生菌種類有哪些？先認識 4 類常見益生菌'},
+    {p:'/blogs/health-beauty/probiotics-benefits', t:'益生菌功效有哪些？7 大常見應用'},
+    {p:'/blogs/health-beauty/when-to-take-probiotics', t:'益生菌什麼時候吃最好？'},
+    {p:'/blogs/health-beauty/probiotics-side-effects', t:'益生菌副作用有哪些？'},
+    {p:'/blogs/%E7%A7%91%E5%AD%B8%E7%87%9F%E9%A4%8A%E5%B8%AB%E5%B0%88%E6%AC%84/%E7%9B%8A%E7%94%9F%E8%8F%8C%E6%80%8E%E9%BA%BC%E5%90%83%E6%89%8D%E5%B0%8D-5-%E5%A4%A7%E5%B8%B8%E8%A6%8B%E8%BF%B7%E6%80%9D%E4%B8%80%E6%AC%A1%E8%A7%A3%E7%AD%94-1', t:'益生菌怎麼吃才對？5 大常見迷思'}
+  ]},
+  {g:'客服', items:[
+    {p:'/pages/%E5%B8%B8%E8%A6%8B%E5%95%8F%E9%A1%8Cfaq', t:'常見問題 FAQ'},
+    {p:'/pages/contact', t:'聯絡我們'}
+  ]},
+  {g:'其他', items:[
+    {p:'__custom__', t:'自己貼網址…'}
+  ]}
+];
+
+var $ = function(id){ return document.getElementById(id); };
+
+/* build channel chips grouped */
+(function(){
+  var host = $('channelSets'), groups = [];
+  CHANNELS.forEach(function(c){ if(groups.indexOf(c.group)<0) groups.push(c.group); });
+  groups.forEach(function(g){
+    var h=document.createElement('p'); h.className='grp'; h.textContent=g; host.appendChild(h);
+    var set=document.createElement('div'); set.className='chipset';
+    CHANNELS.filter(function(c){return c.group===g;}).forEach(function(c){
+      var l=document.createElement('label'); l.className='rchip'+(c.muted?' muted':'');
+      l.innerHTML='<input type="radio" name="channel" id="ch_'+c.id+'" value="'+c.id+'"'+(c.id==='meta_ads'?' checked':'')+'><span>'+c.label+'</span>';
+      set.appendChild(l);
+    });
+    host.appendChild(set);
+  });
+})();
+
+/* campaign chips */
+CAMPAIGNS.forEach(function(c,i){
+  var l=document.createElement('label'); l.className='rchip';
+  l.innerHTML='<input type="radio" name="campaign" id="cp_'+i+'" value="'+c.code+'"'+(i===0?' checked':'')+'><span>'+c.label+(c.code!=='__custom__'?' <code>'+c.code+'</code>':'')+'</span>';
+  $('campSet').appendChild(l);
+});
+
+/* content chips */
+CONTENT_PRESETS.forEach(function(c){
+  var b=document.createElement('button'); b.type='button'; b.className='cchip'; b.dataset.v=c.v;
+  b.innerHTML=c.t+' <code>'+c.v+'</code>';
+  b.addEventListener('click',function(){ $('content').value = ($('content').value===c.v ? '' : c.v); render(); });
+  $('contentChips').appendChild(b);
+});
+(function(){
+  var b=document.createElement('button'); b.type='button'; b.className='cchip clear'; b.textContent='清空';
+  b.addEventListener('click',function(){ $('content').value=''; render(); });
+  $('contentChips').appendChild(b);
+})();
+
+/* page select */
+PAGES.forEach(function(grp){
+  var parent = $('page');
+  if(grp.g){ parent=document.createElement('optgroup'); parent.label=grp.g; $('page').appendChild(parent); }
+  grp.items.forEach(function(it){
+    var o=document.createElement('option'); o.value=it.p; o.textContent=it.t; parent.appendChild(o);
+  });
+});
+
+function val(name){ var el=document.querySelector('input[name="'+name+'"]:checked'); return el?el.value:''; }
+function clean(s){ return String(s||'').trim().toLowerCase().replace(/\s+/g,'_').replace(/^[?&]+/,''); }
+function hasCJK(s){ return /[　-〿㐀-䶿一-鿿＀-￯]/.test(s||''); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function decodeSafe(s){ try{ return decodeURI(s); }catch(e){ return s; } }
+
+function render(){
+  var ch = CHANNELS.filter(function(c){ return c.id===val('channel'); })[0];
+  var campVal = val('campaign');
+  var alerts = [];
+
+  $('channelHint').textContent = ch.hint || '';
+  $('kolBox').hidden = !ch.needsName;
+  $('campCustomBox').hidden = campVal !== '__custom__';
+  $('pageCustomBox').hidden = $('page').value !== '__custom__';
+
+  /* content chip state */
+  var cv = clean($('content').value);
+  Array.prototype.forEach.call(document.querySelectorAll('.cchip[data-v]'), function(b){ b.classList.toggle('on', b.dataset.v===cv); });
+
+  /* page step state */
+  var pageOff = !!(ch.blocked || ch.mode==='params');
+  $('pageFs').style.opacity = pageOff ? '.55' : '';
+  $('page').disabled = pageOff;
+  $('pageCustom').disabled = pageOff;
+  $('pageLead').textContent = ch.mode==='params'
+    ? '廣告的落地頁是貼在 Meta 廣告後台的「網站網址」欄位，這一步用不到。'
+    : '點連結的人會落在官網的哪一頁。';
+  var pv = $('page').value;
+  $('pagePicked').textContent = (pv && pv!=='__custom__' && !pageOff) ? decodeSafe(B+pv) : '';
+
+  if(ch.blocked){
+    $('outLabel').textContent='這裡不用產生連結';
+    $('outSub').textContent='看下方說明';
+    $('output').className='blocked';
+    $('output').textContent='—';
+    $('copyBtn').disabled=true;
+    $('copyBtn').textContent='不適用';
+    $('alerts').innerHTML = alertHTML('err', ch.blocked);
+    $('parts').innerHTML='';
+    return;
+  }
+  $('copyBtn').disabled=false;
+  $('copyBtn').textContent = ch.mode==='params' ? '複製參數' : '複製連結';
+  $('output').className='';
+
+  var source = ch.source;
+  if(ch.needsName){
+    var kn = clean($('kolName').value);
+    if(!kn) alerts.push(['warn','請填 KOL 英文代號，不然來源只會是 <code>kol_</code>。']);
+    else if(hasCJK(kn)) alerts.push(['err','KOL 代號有中文，GA4 會顯示成亂碼。請改用英文。']);
+    source = 'kol_' + kn;
+  }
+
+  var campaign = campVal==='__custom__' ? clean($('campCustom').value) : campVal;
+  if(!campaign) alerts.push(['warn','還沒填新檔期代碼。沒有它，GA4 分不出是哪一波活動帶來的。']);
+  else if(hasCJK(campaign)) alerts.push(['err','檔期代碼有中文，GA4 會顯示成亂碼。請改用英文，格式 <code>主題_年月</code>。']);
+
+  if(hasCJK(cv)) alerts.push(['err','第 3 步的小名有中文，GA4 會顯示成亂碼。請改用英文。']);
+  else if(cv && /^\d+$/.test(cv)) alerts.push(['warn','小名只有數字，之後看報表會認不出是哪一篇。建議用看得懂的英文，例如 <code>opening</code>。']);
+
+  var qs = 'utm_source='+source+'&utm_medium='+ch.medium;
+  if(campaign) qs += '&utm_campaign='+campaign;
+  if(cv) qs += '&utm_content='+cv;
+
+  var outHTML;
+  if(ch.mode==='params'){
+    $('outLabel').textContent='網址參數';
+    $('outSub').textContent='貼到 Meta 廣告後台的「網址參數」欄位';
+    outHTML = '<span class="q">'+esc(qs)+'</span>';
+    $('output').dataset.copy = qs;
+  }else{
+    $('outLabel').textContent='完整連結';
+    $('outSub').textContent='複製後直接貼到貼文或文件裡';
+    var base = pv==='__custom__' ? String($('pageCustom').value||'').trim() : (B+pv);
+    if(!base){
+      alerts.push(['warn','請貼上要導去的網址。']);
+      outHTML = '<span class="q">?'+esc(qs)+'</span>';
+      $('output').dataset.copy = qs;
+    }else{
+      if(/utm_/i.test(base)) alerts.push(['err','你貼的網址<b>已經有 utm 了</b>，會跟這裡的打架。請把問號後面全部刪掉再貼。Shopify 後台的「複製連結」按鈕會自動加上 <code>copyToPasteBoard</code>。']);
+      if(!/^https?:\/\//i.test(base)) alerts.push(['warn','網址開頭不是 <code>https://</code>，請確認是完整網址。']);
+      var sep = base.indexOf('?')>-1 ? '&' : '?';
+      outHTML = esc(base) + '<span class="q">'+sep+esc(qs)+'</span>';
+      $('output').dataset.copy = base + sep + qs;
+    }
+  }
+  $('output').innerHTML = outHTML;
+
+  var hasProblem = alerts.some(function(a){ return a[0]==='err' || a[0]==='warn'; });
+  if(!hasProblem) alerts.unshift(['ok','符合公司規範，可以直接使用。']);
+  if(ch.info) alerts.push(['info', ch.info]);
+  $('alerts').innerHTML = alerts.map(function(a){ return alertHTML(a[0], a[1]); }).join('');
+
+  var parts = [['utm_source',source],['utm_medium',ch.medium],['utm_campaign',campaign],['utm_content',cv]];
+  $('parts').innerHTML = parts.map(function(p){
+    return '<div><dt>'+p[0]+'</dt><dd'+(p[1]?'':' class="empty"')+'>'+(p[1]?esc(p[1]):'沒有使用')+'</dd></div>';
+  }).join('');
+}
+
+function alertHTML(type, html){ return '<div class="alert '+type+'">'+ICON[type]+'<div>'+html+'</div></div>'; }
+
+document.addEventListener('change', render);
+document.addEventListener('input', function(e){ if(e.target.matches('input[type=text]')) render(); });
+
+$('copyBtn').addEventListener('click', function(){
+  var btn=this, text=$('output').dataset.copy || $('output').textContent, label=btn.textContent;
+  var done=function(){ btn.textContent='已複製 ✓'; setTimeout(function(){ btn.textContent=label; },1600); };
+  var fallback=function(){
+    try{ var s=window.getSelection(), r=document.createRange(); r.selectNodeContents($('output')); s.removeAllRanges(); s.addRange(r);
+      btn.textContent='已選取，請按 Ctrl+C'; setTimeout(function(){ btn.textContent=label; },2600);
+    }catch(e){}
+  };
+  try{ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done,fallback); } else { fallback(); } }
+  catch(e){ fallback(); }
+});
+
+render();
+</script>
